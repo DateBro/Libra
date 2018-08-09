@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="login_button">#FAFAFA</color>
+
+    <color name="tab_checked">#b53f57</color>
+    <color name="tab_unchecked">#757575</color>
 </resources>
