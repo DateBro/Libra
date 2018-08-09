@@ -40,4 +40,5 @@ dependencies {
     implementation 'com.ramotion.foldingcell:folding-cell:1.2.2'
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5.1'
     implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.0.5.1'
+    implementation 'com.race604.flyrefresh:library:2.0.0'
 }

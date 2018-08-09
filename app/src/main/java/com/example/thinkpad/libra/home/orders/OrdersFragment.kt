@@ -5,12 +5,17 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.thinkpad.libra.R
 import com.example.thinkpad.libra.data.Order
+import com.scwang.smartrefresh.layout.api.RefreshLayout
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener
+import kotlinx.android.synthetic.main.orders_fragment.*
+
 
 class OrdersFragment: Fragment() {
 
@@ -33,7 +38,7 @@ class OrdersFragment: Fragment() {
         addTestOrders(testOrderList)
 
         orderListView = root.findViewById(R.id.orders_recycler_view)
-        orderListView.layoutManager = LinearLayoutManager(activity)
+        orderListView.layoutManager = LinearLayoutManager(this.activity)
         orderListView.adapter = OrderAdapter(testOrderList)
         orderListView.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
 
