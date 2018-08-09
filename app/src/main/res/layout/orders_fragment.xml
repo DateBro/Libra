@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v7.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:id="@+id/orders_recycler_view">
 
-    <TextView
-        android:id="@+id/charts_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal|center_vertical"
-        android:text="Orders"
-        android:textColor="@color/tab_checked"
-        android:textSize="30sp"
-        tools:text="Orders"/>
-
-</LinearLayout>
+</android.support.v7.widget.RecyclerView>
