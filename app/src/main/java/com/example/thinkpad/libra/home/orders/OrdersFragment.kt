@@ -5,12 +5,16 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import com.example.thinkpad.libra.R
 import com.example.thinkpad.libra.data.Order
+import com.scwang.smartrefresh.layout.api.RefreshLayout
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener
+import kotlinx.android.synthetic.main.card_item_view_order.*
+import kotlinx.android.synthetic.main.orders_fragment.*
 
 
 class OrdersFragment: Fragment() {
@@ -38,6 +42,13 @@ class OrdersFragment: Fragment() {
         orderListView.adapter = OrderAdapter(testOrderList)
         orderListView.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
 
+        try {
+            smart_refresh_layout.setOnRefreshListener { refreshLayout -> refreshLayout.finishRefresh(2000) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("smart_refresh_exception", e.message)
+        }
+
         return root
     }
 
@@ -48,8 +59,7 @@ class OrdersFragment: Fragment() {
     }
 
     private inner class OrderHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(inflater.inflate(R.layout.card_item_view_order, parent, false)), View.OnClickListener {
-        var timeText: TextView = itemView.findViewById(R.id.text_time_content)
-        var dateText: TextView = itemView.findViewById(R.id.text_date_content)
+
         var order: Order = Order(10.0)
 
         init {
@@ -58,8 +68,8 @@ class OrdersFragment: Fragment() {
 
         fun bind(order: Order) {
             this.order = order
-            timeText.text = order.productName
-            dateText.text = order.orderValue.toString()
+            text_time_content?.text = order.productName
+            text_date_content?.text = order.orderValue.toString()
         }
 
         override fun onClick(v: View?) {

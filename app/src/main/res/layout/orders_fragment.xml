@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.scwang.smartrefresh.layout.SmartRefreshLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/smart_refresh_layout">
+    android:layout_height="match_parent">
 
-    <!--srlAccentColor srlPrimaryColor 将会改变 Header 和 Footer 的主题颜色-->
-    <!--srlEnablePreviewInEditMode 可以开启和关闭预览功能-->
-    <com.scwang.smartrefresh.header.DeliveryHeader
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <android.support.v7.widget.RecyclerView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/smart_refresh_layout"
         android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:background="#fff"
-        android:id="@+id/orders_recycler_view">
+        android:layout_width="match_parent">
 
-    </android.support.v7.widget.RecyclerView>
+        <!--srlAccentColor srlPrimaryColor 将会改变 Header 和 Footer 的主题颜色-->
+        <!--srlEnablePreviewInEditMode 可以开启和关闭预览功能-->
+        <com.scwang.smartrefresh.header.DeliveryHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-    <com.scwang.smartrefresh.layout.footer.ClassicsFooter
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <android.support.v7.widget.RecyclerView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:background="#fff"
+            android:id="@+id/orders_recycler_view">
 
-</com.scwang.smartrefresh.layout.SmartRefreshLayout>
+        </android.support.v7.widget.RecyclerView>
+
+        <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+</LinearLayout>
