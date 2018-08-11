@@ -8,12 +8,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.example.thinkpad.libra.R
 import com.example.thinkpad.libra.data.Order
-import kotlinx.android.synthetic.main.cell_title_layout.*
-import kotlinx.android.synthetic.main.card_item_view_order.*
-
-
 
 
 class OrdersFragment: Fragment() {
@@ -36,8 +33,6 @@ class OrdersFragment: Fragment() {
 
         addTestOrders(testOrderList)
 
-        card_folding_cell.setOnClickListener { card_folding_cell.toggle(false) }
-
         orderListView = root.findViewById(R.id.orders_recycler_view)
         orderListView.layoutManager = LinearLayoutManager(this.activity)
         orderListView.adapter = OrderAdapter(testOrderList)
@@ -53,6 +48,8 @@ class OrdersFragment: Fragment() {
     }
 
     private inner class OrderHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(inflater.inflate(R.layout.card_item_view_order, parent, false)), View.OnClickListener {
+        var timeText: TextView = itemView.findViewById(R.id.text_time_content)
+        var dateText: TextView = itemView.findViewById(R.id.text_date_content)
         var order: Order = Order(10.0)
 
         init {
@@ -61,8 +58,8 @@ class OrdersFragment: Fragment() {
 
         fun bind(order: Order) {
             this.order = order
-            text_order_code_title.text = order.productName
-            text_price_title.text = order.orderValue.toString()
+            timeText.text = order.productName
+            dateText.text = order.orderValue.toString()
         }
 
         override fun onClick(v: View?) {
