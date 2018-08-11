@@ -5,16 +5,15 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import com.example.thinkpad.libra.R
 import com.example.thinkpad.libra.data.Order
-import com.scwang.smartrefresh.layout.api.RefreshLayout
-import com.scwang.smartrefresh.layout.listener.OnRefreshListener
-import kotlinx.android.synthetic.main.orders_fragment.*
+import kotlinx.android.synthetic.main.cell_title_layout.*
+import kotlinx.android.synthetic.main.card_item_view_order.*
+
+
 
 
 class OrdersFragment: Fragment() {
@@ -24,7 +23,7 @@ class OrdersFragment: Fragment() {
             val args = Bundle()
             val fragment = OrdersFragment()
             args.putString("info", info)
-            fragment.setArguments(args)
+            fragment.arguments = args
             return fragment
         }
     }
@@ -36,6 +35,8 @@ class OrdersFragment: Fragment() {
         val root: View = inflater.inflate(R.layout.orders_fragment, container, false)
 
         addTestOrders(testOrderList)
+
+        card_folding_cell.setOnClickListener { card_folding_cell.toggle(false) }
 
         orderListView = root.findViewById(R.id.orders_recycler_view)
         orderListView.layoutManager = LinearLayoutManager(this.activity)
@@ -52,8 +53,6 @@ class OrdersFragment: Fragment() {
     }
 
     private inner class OrderHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(inflater.inflate(R.layout.card_item_view_order, parent, false)), View.OnClickListener {
-        var productNameText: TextView = itemView.findViewById(R.id.music_title)
-        var orderValueText: TextView = itemView.findViewById(R.id.music_player)
         var order: Order = Order(10.0)
 
         init {
@@ -62,8 +61,8 @@ class OrdersFragment: Fragment() {
 
         fun bind(order: Order) {
             this.order = order
-            productNameText.text = order.productName
-            orderValueText.text = order.orderValue.toString()
+            text_order_code_title.text = order.productName
+            text_price_title.text = order.orderValue.toString()
         }
 
         override fun onClick(v: View?) {

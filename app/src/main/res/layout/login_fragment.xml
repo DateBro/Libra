@@ -78,7 +78,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="@string/input_authen_code"
+                    android:hint="@string/input_auth_code"
                     android:inputType="phone"
                     android:textAlignment="viewStart"/>
 
@@ -87,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/get_authen_code"
+                    android:text="@string/get_auth_code"
                     android:textAlignment="center"
                     android:textSize="18sp"/>
 
