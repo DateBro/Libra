@@ -42,6 +42,7 @@ class OrdersFragment: Fragment() {
         orderListView.adapter = OrderAdapter(testOrderList)
         orderListView.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
 
+        //添加监听器后一直报错，一直没搞懂应该怎么修改，先用 try 放在这
         try {
             smart_refresh_layout.setOnRefreshListener { refreshLayout -> refreshLayout.finishRefresh(2000) }
         } catch (e: Exception) {

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:padding="10dp">
+
+    <TextView
+        android:id="@+id/item_view_product_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/test_order_code"
+        android:textColor="#000000"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/item_view_product_value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/test_value"
+        android:textColor="#000000"
+        android:textSize="20sp"/>
+
+    <ImageView
+        android:id="@+id/item_view_delete_image"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:contentDescription="@string/delete_order_btn"/>
+
+</LinearLayout>
