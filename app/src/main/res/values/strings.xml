@@ -12,6 +12,12 @@
     <string name="order_code">订单号</string>
     <string name="delete_order_btn">删除订单</string>
     <string name="customer_text">顾客</string>
+    <string name="product_name">商品名称</string>
+    <string name="product_value_text_hint">金额</string>
+    <string name="add_production_image">Add Production</string>
+    <string name="title_today_income">今日营业额</string>
+    <string name="title_today_order_num">今日订单数</string>
+    <string name="about_us_text">关于我们</string>
 
     <string name="test_value">$15</string>
     <string name="test_order_code">880611</string>
@@ -19,7 +25,9 @@
     <string name="test_phone_num">15665827713</string>
     <string name="test_time">08:06</string>
     <string name="test_date">06 11</string>
-    <string name="product_name">商品名称</string>
-    <string name="product_value_text_hint">金额</string>
-    <string name="add_production_image">Add Production</string>
+    <string name="test_store_owner">Developer: DateBro</string>
+    <string name="test_store_contact">sdudatebro@gmail.com</string>
+    <string name="test_today_order_num">16</string>
+    <string name="test_text_today_income">$880611</string>
+    <string name="setting_text">设置</string>
 </resources>

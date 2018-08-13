@@ -36,7 +36,7 @@ class ProductsFragment: Fragment() {
         addTestProducts(testProductList)
         initRecyclerView(root)
 
-        add_product_image.setOnClickListener { TODO("添加新的商品") }
+        add_product_image?.setOnClickListener { TODO("添加新的商品") }
 
         return root
     }
@@ -68,9 +68,9 @@ class ProductsFragment: Fragment() {
             item_view_product_value?.text = product.productValue.toString()
 
             //还缺少一个监听器
-            item_view_delete_image.setOnClickListener(View.OnClickListener {
+            item_view_delete_image?.setOnClickListener {
                 TODO("删除后弹出对话框？")
-            })
+            }
         }
 
         override fun onClick(v: View?) {

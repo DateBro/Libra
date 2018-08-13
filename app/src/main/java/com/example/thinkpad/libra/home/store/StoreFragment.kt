@@ -14,7 +14,7 @@ class StoreFragment: Fragment() {
             val args = Bundle()
             val fragment = StoreFragment()
             args.putString("info", info)
-            fragment.setArguments(args)
+            fragment.arguments = args
             return fragment
         }
     }
