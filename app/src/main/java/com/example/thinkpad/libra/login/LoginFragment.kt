@@ -24,7 +24,6 @@ class LoginFragment : Fragment() {
     private val authCodeURL = "http://39.106.55.9:8088/account/authSms"
     private val loginURL = "http://39.106.55.9:8088/account/login"
     private val registerURL = "http://39.106.55.9:8088/account/register"
-    private val testPhoneNum = "15665827713"
     private val phoneNumberRegex = "^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$"
     private val authCodeRegex = "[0-9]{4}"
     private val defaultMerchantName = "我的商铺"
@@ -51,7 +50,11 @@ class LoginFragment : Fragment() {
             }
         }
 
-        get_authen_code_button.setOnClickListener { sendGetAuthCodeRequest() }
+        get_authen_code_button.setOnClickListener {
+            if (checkPhoneOk()) {
+                sendGetAuthCodeRequest()
+            }
+        }
     }
 
     private fun checkIsRegister(): Boolean {
@@ -104,8 +107,9 @@ class LoginFragment : Fragment() {
     }
 
     private fun createGetAuthCodeRequest(): Request {
+        val phoneNum = phone_edit.text.toString()
         val json = MediaType.parse("application/json; charset=utf-8")
-        val body = RequestBody.create(json, createGetAuthCodeJson(testPhoneNum))
+        val body = RequestBody.create(json, createGetAuthCodeJson(phoneNum))
 
         return Request.Builder()
                 .url(authCodeURL)
