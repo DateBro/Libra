@@ -64,7 +64,6 @@ class OrdersFragment: Fragment() {
             initOrders()
             refreshLayout.finishRefresh(2000)
         }
-
         smart_refresh_layout.setOnLoadMoreListener{refreshLayout ->
             initOrders()
             refreshLayout.finishLoadMore(2000)
