@@ -1,6 +1,8 @@
 package com.example.thinkpad.libra.home.orders
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -15,9 +17,16 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener
 import kotlinx.android.synthetic.main.card_item_view_order.*
 import kotlinx.android.synthetic.main.orders_fragment.*
+import okhttp3.*
+import org.json.JSONObject
+import java.io.IOException
 
 
 class OrdersFragment: Fragment() {
+
+    private val getAllOrdersURL = "http://39.106.55.9:8088/order/list"
+    private val deleteOrderURL = "http://39.106.55.9:8088/order/{id}"
+    private val getOrderURL = "http://39.106.55.9:8088/order/{id}"
 
     companion object {
         fun newInstance(info: String): OrdersFragment {
@@ -29,34 +38,81 @@ class OrdersFragment: Fragment() {
         }
     }
 
-    private lateinit var orderListView: RecyclerView
     private var testOrderList = ArrayList<Order>()
+
+    private var authToken: String = ""
+    private var mPreference: SharedPreferences? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root: View = inflater.inflate(R.layout.orders_fragment, container, false)
 
+        initToken()
         addTestOrders(testOrderList)
-
-        orderListView = root.findViewById(R.id.orders_recycler_view)
-        orderListView.layoutManager = LinearLayoutManager(this.activity)
-        orderListView.adapter = OrderAdapter(testOrderList)
-        orderListView.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
-
-        //添加监听器后一直报错，一直没搞懂应该怎么修改，先用 try 放在这
-        try {
-            smart_refresh_layout.setOnRefreshListener { refreshLayout -> refreshLayout.finishRefresh(2000) }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Log.e("smart_refresh_exception", e.message)
-        }
+        initOrders()
 
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        orders_recycler_view.layoutManager = LinearLayoutManager(activity)
+        orders_recycler_view.adapter = OrderAdapter(testOrderList)
+        orders_recycler_view.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
+
+        smart_refresh_layout.setOnRefreshListener { refreshLayout ->
+            initOrders()
+            refreshLayout.finishRefresh(2000)
+        }
+
+        smart_refresh_layout.setOnLoadMoreListener{refreshLayout ->
+            initOrders()
+            refreshLayout.finishLoadMore(2000)
+        }
+    }
+
+    private fun initOrders() {
+        sendGetAllOrdersRequest()
+        //在这里应该把获得的订单加入列表，但现在没有测试数据没法弄
+    }
+
+    private fun initToken() {
+        mPreference = PreferenceManager.getDefaultSharedPreferences(context)
+        val token = mPreference?.getString("token", "880611")
+        authToken = token.toString()
     }
 
     private fun addTestOrders(testOrderList: ArrayList<Order>) {
         for (i in 0 until 10) {
             testOrderList.add(Order(100.0))
         }
+    }
+
+    private fun sendGetAllOrdersRequest() {
+        val client = OkHttpClient()
+        val request = createGetAllOrdersRequest()
+        getAllOrdersCall(request, client)
+    }
+
+    private fun createGetAllOrdersRequest(): Request {
+        return Request.Builder()
+                .url(getAllOrdersURL)
+                .header("Authorization", authToken)
+                .get()
+                .build()
+    }
+
+    private fun getAllOrdersCall(request: Request, client: OkHttpClient) {
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body()?.string()
+                Log.e("ResponseSuccess", responseBody)
+            }
+        })
     }
 
     private inner class OrderHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(inflater.inflate(R.layout.card_item_view_order, parent, false)), View.OnClickListener {
