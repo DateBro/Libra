@@ -1,5 +1,7 @@
 package com.example.thinkpad.libra.home
 
+import android.content.Context
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
@@ -15,6 +17,12 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var viewPager:ViewPager
     lateinit var bottomNavigationView: BottomNavigationView
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, HomeActivity::class.java)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

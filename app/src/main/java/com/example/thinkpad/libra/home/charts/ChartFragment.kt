@@ -17,10 +17,6 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.data.LineData
 
-
-
-
-
 class ChartFragment:Fragment() {
 
     companion object {

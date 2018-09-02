@@ -73,7 +73,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/profile_image">
 
                 <EditText
-                    android:id="@+id/authen_code_exit"
+                    android:id="@+id/auth_code_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
