@@ -31,4 +31,8 @@
     <string name="test_text_today_income">$880611</string>
     <string name="setting_text">设置</string>
     <string name="exit_text">退出</string>
+    <string name="testProductId">1</string>
+    <string name="text_product_id">ID</string>
+    <string name="text_product_name">商品名称</string>
+    <string name="text_product_value">商品价格</string>
 </resources>

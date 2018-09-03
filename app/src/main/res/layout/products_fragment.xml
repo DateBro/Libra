@@ -13,27 +13,25 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/add_product_name"
+        <TextView
+            android:id="@+id/product_id"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/product_name"
-            android:inputType="textPersonName"/>
-        <EditText
-            android:id="@+id/add_product_value"
+            android:text="@string/text_product_id"/>
+        <TextView
+            android:id="@+id/text_product_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/product_value_text_hint"
-            android:inputType="textPersonName" />
+            android:layout_weight="3"
+            android:text="@string/text_product_name"/>
 
-        <ImageView
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/ic_input_add"
-            android:id="@+id/add_product_image"
-            android:contentDescription="@string/add_production_image"/>
+            android:layout_weight="3"
+            android:id="@+id/text_product_value"
+            android:text="@string/text_product_value"/>
 
     </LinearLayout>
 

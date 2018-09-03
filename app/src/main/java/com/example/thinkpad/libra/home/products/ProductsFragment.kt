@@ -117,11 +117,6 @@ class ProductsFragment: Fragment() {
             this.product = product
             item_view_product_name?.text = product.productName
             item_view_product_value?.text = product.productValue.toString()
-
-            //还缺少一个监听器
-            item_view_delete_image?.setOnClickListener {
-                TODO("删除后弹出对话框？")
-            }
         }
 
         override fun onClick(v: View?) {
