@@ -1,21 +1,18 @@
 package com.example.thinkpad.libra.data
 
-import java.util.*
+/**
+ * @author  Zhiyong Zhao
+ */
+class Order(value: String = "totalPrice", id: String = "id",time:String = "Time") {
 
-class Order(orderValue: Double = 10.0, orderId: Int = 0) {
-    var productName: String = "Apple"
-
-    var orderId: Int = 0
-
-    var orderTime: Date = Date()
-
-    var customerInfo: String = "DateBro"
-
-    var orderValue: Double = 0.0
+    var orderId:String = "id"
+    var totalPrice: String = "totalPrice"
+    var payTime: String = "payTime"
 
     init {
-        this.orderValue = orderValue
-        this.orderId = orderId
+        totalPrice = value
+        orderId = id
+        payTime = time
     }
 
 }

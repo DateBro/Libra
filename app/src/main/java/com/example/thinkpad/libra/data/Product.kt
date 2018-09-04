@@ -1,9 +1,12 @@
 package com.example.thinkpad.libra.data
 
+/**
+ * @author  Zhiyong Zhao
+ */
 class Product {
 
-    var productName: String = "Apple"
-    var productValue: String = "$0.0"
+    var productName: String = "productName"
+    var productValue: String = "productValue"
     var productId: Int = 1
 
     constructor(name: String = "Apple", value: String = "$6.11") {
