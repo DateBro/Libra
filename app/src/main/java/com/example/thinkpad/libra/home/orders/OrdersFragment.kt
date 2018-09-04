@@ -58,7 +58,6 @@ class OrdersFragment: Fragment() {
 
         orders_recycler_view.layoutManager = LinearLayoutManager(activity)
         orders_recycler_view.adapter = OrderAdapter(testOrderList)
-        orders_recycler_view.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
 
         smart_refresh_layout.setOnRefreshListener { refreshLayout ->
             initOrders()

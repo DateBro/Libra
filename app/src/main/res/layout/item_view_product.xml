@@ -10,7 +10,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="@string/testProductId"
         android:textColor="#000000"
         android:textSize="20sp"/>
 
@@ -19,7 +18,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="3"
-        android:text="@string/test_order_code"
         android:textColor="#000000"
         android:textSize="20sp"/>
 
@@ -28,7 +26,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="3"
-        android:text="@string/test_value"
         android:textColor="#000000"
         android:textSize="20sp"/>
 

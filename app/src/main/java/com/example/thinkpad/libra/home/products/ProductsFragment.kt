@@ -1,5 +1,7 @@
 package com.example.thinkpad.libra.home.products
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -13,16 +15,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.thinkpad.libra.R
 import com.example.thinkpad.libra.data.Product
+import com.example.thinkpad.libra.data.source.ProductsLab
 import kotlinx.android.synthetic.main.item_view_product.*
+import kotlinx.android.synthetic.main.item_view_product.view.*
 import kotlinx.android.synthetic.main.products_fragment.*
-import okhttp3.*
-import java.io.IOException
-
 
 class ProductsFragment: Fragment() {
-
-    private val getAllProductsURL = "http://39.106.55.9:8088/goods/list"
-
     companion object {
         fun newInstance(info: String): ProductsFragment {
             val args = Bundle()
@@ -34,42 +32,51 @@ class ProductsFragment: Fragment() {
     }
 
     private var testProductList = ArrayList<Product>()
-
     private var authToken: String = ""
     private var mPreference: SharedPreferences? = null
+    private var productsAdapter:ProductAdapter? = null
+    private var productsLab: ProductsLab? = null
+    private var mContext: Context? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root: View = inflater.inflate(R.layout.products_fragment, container, false)
-
-        initProducts()
-        addTestProducts(testProductList)
-
-        return root
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initToken()
+        return inflater.inflate(R.layout.products_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initRecyclerView()
+        initToken()
+        productsLab =ProductsLab.getProductsLab(authToken)
+        updateUI()
+    }
 
+    private fun initRecyclerView() {
         products_recycler_view.layoutManager = LinearLayoutManager(this.activity)
-        products_recycler_view.adapter = ProductAdapter(testProductList)
         products_recycler_view.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
-
     }
 
-    private fun addTestProducts(testProductList: ArrayList<Product>) {
-        for (i in 0 until 10) {
-            testProductList.add(Product("Banana", 10.5))
+    private fun updateUI() {
+        if (productsAdapter == null) {
+            makeSureProductListNotNull()
+            productsAdapter = ProductAdapter(testProductList)
+            products_recycler_view.adapter = productsAdapter
+        }else {
+            productsAdapter?.notifyDataSetChanged()
         }
+        Log.e("currentCallTime", "lstSize" + testProductList.size + System.currentTimeMillis())
     }
 
-    private fun initProducts() {
-        sendGetAllProductsRequest()
-        //在这里应该把获得的产品信息加入列表，但现在没有测试数据没法弄
+    private fun makeSureProductListNotNull() {
+        if (testProductList.size == 0) {
+//            Log.e("currentCallTime", "getList" + System.currentTimeMillis())
+//            testProductList = productsLab?.getProductList() ?: ArrayList()
+//            if (testProductList.size == 0) {
+//                Log.e("testListNull", "Null " + System.currentTimeMillis())
+//            }
+            for (i in 0 until 3) {
+                testProductList.add(Product(id = i))
+            }
+        }
     }
 
     private fun initToken() {
@@ -78,45 +85,20 @@ class ProductsFragment: Fragment() {
         authToken = token.toString()
     }
 
-    private fun sendGetAllProductsRequest() {
-        val client = OkHttpClient()
-        val request = createGetAllProductsRequest()
-        getAllProductsCall(request, client)
-    }
-
-    private fun createGetAllProductsRequest(): Request {
-        return Request.Builder()
-                .url(getAllProductsURL)
-                .header("Authorization", authToken)
-                .get()
-                .build()
-    }
-
-    private fun getAllProductsCall(request: Request, client: OkHttpClient) {
-        val call = client.newCall(request)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val responseBody = response.body()?.string()
-                Log.e("ResponseSuccessProduct", responseBody)
-            }
-        })
-    }
-
     private inner class ProductHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(inflater.inflate(R.layout.item_view_product, parent, false)), View.OnClickListener {
 
-        var product: Product = Product("Pineapple")
+        var mProduct: Product = Product("Test", "$0.00")
 
         init {
             itemView.setOnClickListener(this)
         }
 
+        @SuppressLint("SetTextI18n")
         fun bind(product: Product) {
-            this.product = product
-            item_view_product_name?.text = product.productName
-            item_view_product_value?.text = product.productValue.toString()
+            mProduct = product
+            itemView.item_view_product_name.text = mProduct.productName
+            itemView.item_view_product_value.text = "$" + mProduct.productValue
+            itemView.item_view_product_id.text = mProduct.productId.toString()
         }
 
         override fun onClick(v: View?) {
@@ -127,7 +109,7 @@ class ProductsFragment: Fragment() {
     private inner class ProductAdapter(internal var productList: List<Product>) : RecyclerView.Adapter<ProductHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductHolder {
-            val inflater = LayoutInflater.from(activity)
+            val inflater = LayoutInflater.from(mContext)
             return ProductHolder(inflater, parent)
         }
 
@@ -139,6 +121,20 @@ class ProductsFragment: Fragment() {
         override fun getItemCount(): Int {
             return productList.size
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        initToken()
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        mContext = context
     }
 
 }

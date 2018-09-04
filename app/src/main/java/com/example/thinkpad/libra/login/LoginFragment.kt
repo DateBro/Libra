@@ -180,6 +180,7 @@ class LoginFragment : Fragment() {
             val data = jsonObjectTest.getString("data")
             val tokenObject = JSONObject(data)
             val token: String = tokenObject.getString("token")
+            Log.e("whereIsToken", token)
             context?.let { setSharedPreference(it, token) }
         } catch (e: JSONException) {
             e.printStackTrace()
