@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
@@ -15,10 +17,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.thinkpad.libra.R
 import com.example.thinkpad.libra.data.Product
-import com.example.thinkpad.libra.data.source.ProductsLab
-import kotlinx.android.synthetic.main.item_view_product.*
 import kotlinx.android.synthetic.main.item_view_product.view.*
 import kotlinx.android.synthetic.main.products_fragment.*
+import okhttp3.*
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.IOException
 
 class ProductsFragment: Fragment() {
     companion object {
@@ -31,11 +35,13 @@ class ProductsFragment: Fragment() {
         }
     }
 
+    private val mHandler = Handler(Looper.getMainLooper())
+
+    private val getAllProductsURL = "http://39.106.55.9:8088/goods/list"
     private var testProductList = ArrayList<Product>()
     private var authToken: String = ""
     private var mPreference: SharedPreferences? = null
     private var productsAdapter:ProductAdapter? = null
-    private var productsLab: ProductsLab? = null
     private var mContext: Context? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,8 +52,7 @@ class ProductsFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
         initToken()
-        productsLab =ProductsLab.getProductsLab(authToken)
-        updateUI()
+        sendGetAllProductsRequest()
     }
 
     private fun initRecyclerView() {
@@ -56,33 +61,85 @@ class ProductsFragment: Fragment() {
     }
 
     private fun updateUI() {
-        if (productsAdapter == null) {
-            makeSureProductListNotNull()
-            productsAdapter = ProductAdapter(testProductList)
-            products_recycler_view.adapter = productsAdapter
-        }else {
-            productsAdapter?.notifyDataSetChanged()
-        }
-        Log.e("currentCallTime", "lstSize" + testProductList.size + System.currentTimeMillis())
-    }
-
-    private fun makeSureProductListNotNull() {
-        if (testProductList.size == 0) {
-//            Log.e("currentCallTime", "getList" + System.currentTimeMillis())
-//            testProductList = productsLab?.getProductList() ?: ArrayList()
-//            if (testProductList.size == 0) {
-//                Log.e("testListNull", "Null " + System.currentTimeMillis())
-//            }
-            for (i in 0 until 3) {
-                testProductList.add(Product(id = i))
+        try {
+            if (productsAdapter == null) {
+                productsAdapter = ProductAdapter(testProductList)
+                products_recycler_view.adapter = productsAdapter
+            } else {
+                productsAdapter?.notifyDataSetChanged()
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("updateUIException", e.message)
         }
+
     }
 
     private fun initToken() {
         mPreference = PreferenceManager.getDefaultSharedPreferences(context)
         val token = mPreference?.getString("token", "880611")
         authToken = token.toString()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        initToken()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initToken()
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        mContext = context
+    }
+
+    private fun sendGetAllProductsRequest() {
+        val client = OkHttpClient()
+        val request = createGetAllProductsRequest()
+        getAllProductsCall(request, client)
+    }
+
+    private fun createGetAllProductsRequest(): Request {
+        return Request.Builder()
+                .url(getAllProductsURL)
+                .header("Authorization", authToken)
+                .get()
+                .build()
+    }
+
+    private fun getAllProductsCall(request: Request, client: OkHttpClient) {
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body()?.string()
+                parseGetAllProductsJson(responseBody.toString())
+
+                mHandler.post { updateUI() }
+            }
+        })
+    }
+
+    private fun parseGetAllProductsJson(jsonData: String) {
+        try {
+            testProductList = ArrayList()
+            val jsonObjectTest = JSONObject(jsonData)
+            val data = jsonObjectTest.getJSONArray("data")
+            for (i in 0 until data.length()) {
+                val jsonObject = data.getJSONObject(i)
+                val id = jsonObject.getString("id").toInt()
+                val name = jsonObject.getString("name")
+                val price = jsonObject.getString("price")
+                val product = Product(name, price, id)
+                testProductList.add(product)
+            }
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
     }
 
     private inner class ProductHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(inflater.inflate(R.layout.item_view_product, parent, false)), View.OnClickListener {
@@ -121,20 +178,6 @@ class ProductsFragment: Fragment() {
         override fun getItemCount(): Int {
             return productList.size
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        initToken()
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        mContext = context
     }
 
 }

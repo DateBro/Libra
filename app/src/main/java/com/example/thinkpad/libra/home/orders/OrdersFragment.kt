@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
 import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -15,10 +16,17 @@ import android.view.ViewGroup
 import com.example.thinkpad.libra.R
 import com.example.thinkpad.libra.data.Order
 import com.example.thinkpad.libra.data.OrderDetail
-import com.example.thinkpad.libra.data.source.OrdersLab
+import com.example.thinkpad.libra.data.Product
 import com.ontbee.legacyforks.cn.pedant.SweetAlert.SweetAlertDialog
 import kotlinx.android.synthetic.main.card_item_view_order.view.*
 import kotlinx.android.synthetic.main.orders_fragment.*
+import okhttp3.*
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.IOException
+import android.os.Looper
+
+
 
 /**
  * @author  Zhiyong Zhao
@@ -35,11 +43,18 @@ class OrdersFragment : Fragment() {
         }
     }
 
+    private val mHandler = Handler(Looper.getMainLooper())
+
+    private val getAllOrdersURL = "http://39.106.55.9:8088/order/list"
+    private val deleteOrderURL = "http://39.106.55.9:8088/order/"
+    private val getOrderURL = "http://39.106.55.9:8088/order/"
+    private var wantedOrder: Order? = null
+    private var wantedOrderDetailList: ArrayList<OrderDetail> = ArrayList()
+
     private var testOrderList = ArrayList<Order>()
     private var authToken: String = ""
     private var mPreference: SharedPreferences? = null
     private var ordersAdapter: OrderAdapter? = null
-    private var ordersLab: OrdersLab? = null
     private var mContext: Context? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,19 +65,17 @@ class OrdersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
         initRefreshLayout()
-        initToken()
-        ordersLab = OrdersLab.getOrdersLab(authToken)
-        addTestOrders(testOrderList)
-        updateUI()
+
+//        sendGetAllOrdersRequest()
     }
 
     private fun initRefreshLayout() {
         smart_refresh_layout.setOnRefreshListener { refreshLayout ->
-            updateUI()
+            mHandler.post { updateUI() }
             refreshLayout.finishRefresh(2000)
         }
         smart_refresh_layout.setOnLoadMoreListener { refreshLayout ->
-            updateUI()
+            mHandler.post { updateUI() }
             refreshLayout.finishLoadMore(2000)
         }
     }
@@ -72,17 +85,10 @@ class OrdersFragment : Fragment() {
         orders_recycler_view.adapter = ordersAdapter
     }
 
-    private fun updateOrders() {
-        if (testOrderList.size == 0) {
-            testOrderList = ordersLab?.getOrderList() ?: ArrayList()
-        }
-    }
-
     private fun updateUI() {
         if (ordersAdapter == null) {
-            updateOrders()
             ordersAdapter = OrderAdapter(testOrderList)
-            orders_recycler_view.adapter = ordersAdapter
+            orders_recycler_view?.adapter = ordersAdapter
         } else {
             ordersAdapter?.notifyDataSetChanged()
         }
@@ -94,15 +100,134 @@ class OrdersFragment : Fragment() {
         authToken = token.toString()
     }
 
-    private fun addTestOrders(testOrderList: ArrayList<Order>) {
-        for (i in 0 until 3) {
-            testOrderList.add(Order())
-        }
+    override fun onResume() {
+        super.onResume()
+        initToken()
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         mContext = context
+    }
+
+    private fun sendGetAllOrdersRequest() {
+        val client = OkHttpClient()
+        val request = createGetAllOrdersRequest()
+        getAllOrdersCall(request, client)
+    }
+
+    private fun createGetAllOrdersRequest(): Request {
+        return Request.Builder()
+                .url(getAllOrdersURL)
+                .header("Authorization", authToken)
+                .get()
+                .build()
+    }
+
+    private fun getAllOrdersCall(request: Request, client: OkHttpClient) {
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body()?.string()
+//                parseGetAllOrdersJson(responseBody.toString())
+
+                mHandler.post { updateUI() }
+            }
+        })
+    }
+
+    private fun parseGetAllOrdersJson(jsonData: String) {
+        try {
+            testOrderList = ArrayList()
+            val dataJsonObject = JSONObject(jsonData)
+            val data = dataJsonObject.getJSONArray("data")
+            for (i in 0 until data.length()) {
+                val orderJsonObject = data.getJSONObject(i)
+                val orderId:String = orderJsonObject.get("id").toString()
+                val payTime: String = orderJsonObject.get("payTime").toString()
+                val totalPrice: String = orderJsonObject.get("totalPrice").toString()
+                val order = Order(totalPrice, orderId, payTime)
+                testOrderList.add(order)
+            }
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun sendDeleteOrderRequest(orderId: String) {
+        val client = OkHttpClient()
+        val request = createDeleteOrderRequest(orderId)
+        deleteOrderCall(request, client)
+    }
+
+    private fun createDeleteOrderRequest(orderId: String): Request {
+        return Request.Builder()
+                .url(deleteOrderURL+orderId)
+                .header("Authorization", authToken)
+                .get()
+                .build()
+    }
+
+    private fun deleteOrderCall(request: Request, client: OkHttpClient) {
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+
+            override fun onResponse(call: Call, response: Response) {}
+        })
+    }
+
+    private fun sendGetWantedOrderRequest(orderId: String) {
+        val client = OkHttpClient()
+        val request = createGetWantedOrderRequest(orderId)
+        getWantedOrderCall(request, client)
+    }
+
+    private fun createGetWantedOrderRequest(orderId: String): Request {
+        return Request.Builder()
+                .url(getOrderURL+orderId)
+                .header("Authorization", authToken)
+                .get()
+                .build()
+    }
+
+    private fun getWantedOrderCall(request: Request, client: OkHttpClient) {
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+            override fun onResponse(call: Call, response: Response) {
+                parseGetWantedOrderJson(response.body().toString())
+            }
+        })
+    }
+
+    private fun parseGetWantedOrderJson(jsonData: String) {
+        try {
+            wantedOrder = null
+            val dataJsonObject = JSONObject(jsonData)
+            val orderId:String = dataJsonObject.get("id").toString()
+            val payTime: String = dataJsonObject.get("payTime").toString()
+            val totalPrice: String = dataJsonObject.get("totalPrice").toString()
+            wantedOrder = Order(totalPrice, orderId, payTime)
+
+            val orderProducts = dataJsonObject.getJSONArray("orderGoods")
+            for (i in 0 until orderProducts.length()) {
+                val productsJsonObject = orderProducts.getJSONObject(i)
+                val productJson = productsJsonObject.getJSONObject("goods")
+                val productName = productJson.getString("name")
+                val productPrice:String = productJson.get("price").toString()
+                val weight: String = productsJsonObject.get("weight").toString()
+                val totalPay: String = productsJsonObject.get("totalPay").toString()
+                val orderProduct = Product(productName, productPrice)
+                val orderDetail = OrderDetail(orderProduct, weight, totalPay)
+                wantedOrderDetailList.add(orderDetail)
+            }
+        } catch (e: JSONException) {
+            Log.e("parseWantedOrderExc", e.message)
+            e.printStackTrace()
+        }
     }
 
     private inner class OrderHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(inflater.inflate(R.layout.card_item_view_order, parent, false)), View.OnClickListener {
@@ -123,15 +248,15 @@ class OrdersFragment : Fragment() {
             itemView.text_order_id_content.text = mOrder.orderId
 
             itemView.delete_order_button_content.setOnClickListener {
-                showSweetAlertDialog()
+                showSweetAlertDialog(mOrder.orderId)
             }
         }
 
         override fun onClick(v: View?) {
-            wantedOrderDetailList = ordersLab?.getWantedOrder(mOrder.orderId) ?: ArrayList()
+            wantedOrderDetailList
         }
 
-        private fun showSweetAlertDialog() {
+        private fun showSweetAlertDialog(orderId: String) {
             SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE)
                     .setTitleText("确认删除？")
                     .setContentText("删除的订单将不能恢复！")
@@ -144,7 +269,8 @@ class OrdersFragment : Fragment() {
                                 .setConfirmClickListener(null)
                                 .changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
 
-                        this@OrdersFragment.ordersLab?.deleteOrder(mOrder.orderId)
+                        sendDeleteOrderRequest(orderId)
+                        smart_refresh_layout.RefreshKernelImpl()
                     }
                     .show()
         }
