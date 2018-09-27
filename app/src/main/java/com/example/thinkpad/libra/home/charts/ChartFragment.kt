@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +44,7 @@ class ChartFragment:Fragment() {
     private var popularProductList = ArrayList<Product>()
     private var lineEntries:ArrayList<Entry> = ArrayList()
     private var barEntries: ArrayList<BarEntry> = ArrayList()
-    private var barXAxisStringValue: Array<String> = Array(5) { "无" }
+    private var barXAxisStringValue: Array<String> = Array(50) { "无" }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.charts_fragment, container, false)
@@ -54,13 +53,13 @@ class ChartFragment:Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initToken()
-
         sendGetDailyOrdersRequest()
         sendGetPopularProductsRequest()
     }
 
     private fun addOrdersIntoEntries(testOrderList: ArrayList<Order>,entries:ArrayList<Entry>) {
         if (testOrderList.size > 0) {
+            entries.clear()
             for (i in 0 until testOrderList.size) {
                 entries.add(Entry(i.toFloat(), testOrderList[i].totalPrice.toFloat()))
             }
@@ -69,6 +68,7 @@ class ChartFragment:Fragment() {
 
     private fun addProductsIntoEntries(popularProductList: ArrayList<Product>, barEntries: ArrayList<BarEntry>) {
         if (popularProductList.size > 0) {
+            barEntries.clear()
             for (i in 0 until popularProductList.size) {
                 barEntries.add(BarEntry(i.toFloat(), popularProductList[i].productValue.toFloat()))
             }
@@ -77,6 +77,7 @@ class ChartFragment:Fragment() {
 
     private fun configureLineChart() {
         addOrdersIntoEntries(dailyOrderList, lineEntries)
+        configureLineAxis()
 
         val dataSet = LineDataSet(lineEntries, "一周内营业额变化图")
         val lineData = LineData(dataSet)
@@ -110,9 +111,14 @@ class ChartFragment:Fragment() {
         barXAxis.valueFormatter = XAxisValueFormatter(barXAxisStringValue)
     }
 
+    private fun configureLineAxis() {
+        val lineYAxis = line_chart.axisLeft
+        lineYAxis.valueFormatter = YAxisValueFormatter()
+    }
+
     private fun initToken() {
         mPreference = PreferenceManager.getDefaultSharedPreferences(context)
-        val token = mPreference?.getString("token", "880611")
+        val token = mPreference?.getString("token", "19880611")
         authToken = token.toString()
     }
 
@@ -146,7 +152,7 @@ class ChartFragment:Fragment() {
 
     private fun parseGetPopularProductsJson(jsonData: String) {
         try {
-            popularProductList = ArrayList()
+            popularProductList.clear()
             val dataJsonObject = JSONObject(jsonData)
             val data = dataJsonObject.getJSONArray("data")
             for (i in 0 until data.length()) {
@@ -191,10 +197,10 @@ class ChartFragment:Fragment() {
 
     private fun parseGetDailyOrdersJson(jsonData: String) {
         try {
-            dailyOrderList = ArrayList()
+            dailyOrderList.clear()
             val dataJsonObject = JSONObject(jsonData)
             val data = dataJsonObject.getJSONArray("data")
-            for (i in data.length()-1 downTo 22) {
+            for (i in 0 until 7) {
                 val orderJsonObject = data.getJSONObject(i)
                 val orderMoney: String = orderJsonObject.get("money").toString()
                 val orderDate: String = orderJsonObject.get("date").toString()

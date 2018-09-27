@@ -51,8 +51,20 @@ class ProductsFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
+        initRefreshLayout()
         initToken()
         sendGetAllProductsRequest()
+    }
+
+    private fun initRefreshLayout() {
+        smart_refresh_layout.setOnRefreshListener { refreshLayout ->
+            mHandler.post { updateUI() }
+            refreshLayout.finishRefresh(2000)
+        }
+        smart_refresh_layout.setOnLoadMoreListener { refreshLayout ->
+            mHandler.post { updateUI() }
+            refreshLayout.finishLoadMore(2000)
+        }
     }
 
     private fun initRecyclerView() {
@@ -61,16 +73,12 @@ class ProductsFragment: Fragment() {
     }
 
     private fun updateUI() {
+        assureProductList(testProductList)
         try {
-            if (productsAdapter == null) {
-                productsAdapter = ProductAdapter(testProductList)
-                products_recycler_view.adapter = productsAdapter
-            } else {
-                productsAdapter?.notifyDataSetChanged()
-            }
+            productsAdapter = ProductAdapter(testProductList)
+            products_recycler_view.adapter = productsAdapter
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e("updateUIException", e.message)
         }
 
     }
@@ -89,6 +97,16 @@ class ProductsFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         initToken()
+        assureProductList(testProductList)
+    }
+
+    private fun assureProductList(productList: ArrayList<Product>) {
+        if (productList.size == 0) {
+            productList.clear()
+            productList.add(Product("苹果", "6.98", 1))
+            productList.add(Product("香蕉", "3.58", 2))
+            productList.add(Product("葡萄", "9.9", 3))
+        }
     }
 
     override fun onAttach(context: Context?) {
@@ -125,8 +143,9 @@ class ProductsFragment: Fragment() {
     }
 
     private fun parseGetAllProductsJson(jsonData: String) {
+        Log.e("parseAllProductsJson", jsonData)
         try {
-            testProductList = ArrayList()
+            testProductList.clear()
             val jsonObjectTest = JSONObject(jsonData)
             val data = jsonObjectTest.getJSONArray("data")
             for (i in 0 until data.length()) {

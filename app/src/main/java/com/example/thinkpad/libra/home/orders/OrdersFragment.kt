@@ -26,8 +26,6 @@ import org.json.JSONObject
 import java.io.IOException
 import android.os.Looper
 
-
-
 /**
  * @author  Zhiyong Zhao
  */
@@ -44,13 +42,11 @@ class OrdersFragment : Fragment() {
     }
 
     private val mHandler = Handler(Looper.getMainLooper())
-
     private val getAllOrdersURL = "http://39.106.55.9:8088/order/list"
     private val deleteOrderURL = "http://39.106.55.9:8088/order/"
     private val getOrderURL = "http://39.106.55.9:8088/order/"
     private var wantedOrder: Order? = null
     private var wantedOrderDetailList: ArrayList<OrderDetail> = ArrayList()
-
     private var testOrderList = ArrayList<Order>()
     private var authToken: String = ""
     private var mPreference: SharedPreferences? = null
@@ -65,8 +61,13 @@ class OrdersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
         initRefreshLayout()
+        initToken()
+        sendGetAllOrdersRequest()
+    }
 
-//        sendGetAllOrdersRequest()
+    private fun addTestOrders() {
+        testOrderList.clear()
+        testOrderList.add(Order())
     }
 
     private fun initRefreshLayout() {
@@ -87,6 +88,9 @@ class OrdersFragment : Fragment() {
 
     private fun updateUI() {
         if (ordersAdapter == null) {
+            if (testOrderList.size == 0) {
+                addTestOrders()
+            }
             ordersAdapter = OrderAdapter(testOrderList)
             orders_recycler_view?.adapter = ordersAdapter
         } else {
@@ -131,7 +135,8 @@ class OrdersFragment : Fragment() {
 
             override fun onResponse(call: Call, response: Response) {
                 val responseBody = response.body()?.string()
-//                parseGetAllOrdersJson(responseBody.toString())
+                Log.e("getAllOrdersCall", responseBody)
+                parseGetAllOrdersJson(responseBody.toString())
 
                 mHandler.post { updateUI() }
             }
@@ -140,7 +145,7 @@ class OrdersFragment : Fragment() {
 
     private fun parseGetAllOrdersJson(jsonData: String) {
         try {
-            testOrderList = ArrayList()
+            testOrderList.clear()
             val dataJsonObject = JSONObject(jsonData)
             val data = dataJsonObject.getJSONArray("data")
             for (i in 0 until data.length()) {
@@ -225,7 +230,6 @@ class OrdersFragment : Fragment() {
                 wantedOrderDetailList.add(orderDetail)
             }
         } catch (e: JSONException) {
-            Log.e("parseWantedOrderExc", e.message)
             e.printStackTrace()
         }
     }
@@ -242,13 +246,20 @@ class OrdersFragment : Fragment() {
         @SuppressLint("SetTextI18n")
         fun bind(order: Order) {
             mOrder = order
-            itemView.text_time_content.text = mOrder.payTime
-            itemView.text_date_content.text = mOrder.payTime
+            if (mOrder.payTime.length > 9) {
+                itemView.text_time_content.text = mOrder.payTime.subSequence(12, 16)
+                itemView.text_date_content.text = mOrder.payTime.subSequence(0, 10)
+            } else {
+                itemView.text_time_content.text = mOrder.payTime
+                itemView.text_date_content.text = mOrder.payTime
+            }
             itemView.text_value_content.text = "$" + mOrder.totalPrice
             itemView.text_order_id_content.text = mOrder.orderId
 
             itemView.delete_order_button_content.setOnClickListener {
-                showSweetAlertDialog(mOrder.orderId)
+                mHandler.post { showSweetAlertDialog(mOrder.orderId)
+                    itemView.invalidate()
+                }
             }
         }
 
@@ -269,8 +280,9 @@ class OrdersFragment : Fragment() {
                                 .setConfirmClickListener(null)
                                 .changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
 
+                        testOrderList.remove(mOrder)
                         sendDeleteOrderRequest(orderId)
-                        smart_refresh_layout.RefreshKernelImpl()
+                        smart_refresh_layout.autoRefresh()
                     }
                     .show()
         }

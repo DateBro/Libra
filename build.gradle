@@ -3,7 +3,8 @@
 buildscript {
     ext.kotlin_version = '1.2.60'
     repositories {
-        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+//        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        jcenter()
         maven { url 'https://jitpack.io' }
         google()
     }
@@ -18,7 +19,8 @@ buildscript {
 
 allprojects {
     repositories {
-        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+//        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        jcenter()
         maven { url 'https://jitpack.io' }
         google()
     }

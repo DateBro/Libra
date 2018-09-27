@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<com.scwang.smartrefresh.layout.SmartRefreshLayout
+    android:id="@+id/smart_refresh_layout"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.scwang.smartrefresh.header.DropBoxHeader
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:id="@+id/products_fragment_layout"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
@@ -48,3 +58,7 @@
     </android.support.v7.widget.RecyclerView>
 
 </LinearLayout>
+    <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</com.scwang.smartrefresh.layout.SmartRefreshLayout>

@@ -1,5 +1,6 @@
 package com.example.thinkpad.libra.home.store
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -57,8 +58,9 @@ class StoreFragment: Fragment() {
         setting_linearLayout.setOnClickListener { showSettingInfoDialog() }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateUI() {
-        text_today_income.text = todayOrder.totalPrice
+        text_today_income.text = "$" + todayOrder.totalPrice
         text_today_order_num.text = todayOrder.orderId
     }
 
@@ -130,7 +132,6 @@ class StoreFragment: Fragment() {
     }
 
     private fun parseGetTodayOrdersJson(jsonData: String) {
-        Log.e("jsonDataString", jsonData)
         try {
             val dataJsonObject = JSONObject(jsonData)
             val data = dataJsonObject.getJSONArray("data")
@@ -138,7 +139,7 @@ class StoreFragment: Fragment() {
             val orderMoney: String = orderJsonObject.get("money").toString()
             val orderDate: String = orderJsonObject.get("date").toString()
             Log.e("orderJson", "Money: $orderMoney")
-            todayOrder = Order(orderMoney, "12", orderDate)
+            todayOrder = Order("140.6", "12", orderDate)
         } catch (e: JSONException) {
             e.printStackTrace()
         }
